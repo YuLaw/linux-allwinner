@@ -49,16 +49,17 @@ struct cpufreq_dvfs {
 };
 static struct cpufreq_dvfs dvfs_table[] = {
     {.freq = 1056000000, .volt = 1500}, /* core vdd is 1.50v if cpu frequency is (1008Mhz, xxxxMhz] */
-    {.freq = 1008000000, .volt = 1400}, /* core vdd is 1.40v if cpu frequency is (960Mhz, 1008Mhz]  */
-    {.freq = 960000000,  .volt = 1400}, /* core vdd is 1.40v if cpu frequency is (912Mhz, 960Mhz]   */
+    {.freq = 1008000000, .volt = 1350}, /* core vdd is 1.35v if cpu frequency is (960Mhz, 1008Mhz]  */
+    {.freq = 960000000,  .volt = 1350}, /* core vdd is 1.35v if cpu frequency is (912Mhz, 960Mhz]   */
     {.freq = 912000000,  .volt = 1350}, /* core vdd is 1.35v if cpu frequency is (864Mhz, 912Mhz]   */
     {.freq = 864000000,  .volt = 1300}, /* core vdd is 1.30v if cpu frequency is (624Mhz, 864Mhz]   */
     {.freq = 624000000,  .volt = 1250}, /* core vdd is 1.25v if cpu frequency is (432Mhz, 624Mhz]   */
-    {.freq = 432000000,  .volt = 1250}, /* core vdd is 1.25v if cpu frequency is (0, 432Mhz]        */
-    {.freq = 0,          .volt = 1000}, /* end of cpu dvfs table                                    */
+    {.freq = 432000000,  .volt = 1150}, /* core vdd is 1.25v if cpu frequency is (108Mhz, 432Mhz]      */
+    {.freq = 108000000,  .volt = 900},  /* core vdd is 0.9v  if cpu frequency is (0, 108Mhz]        */
+    {.freq = 0,          .volt = 900},  /* end of cpu dvfs table                                    */
 };
 static struct regulator *corevdd;
-static unsigned int last_vdd    = 1400;     /* backup last target voltage, default is 1.4v  */
+static unsigned int last_vdd    = 1350;     /* backup last target voltage, default is 1.4v  */
 #endif
 
 /*
