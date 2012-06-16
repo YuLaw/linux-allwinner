@@ -1045,13 +1045,13 @@ __s32 LCD_POWER_EN(__u32 sel, __bool b_en)
 
     if(gdisp.screen[sel].lcd_cfg.lcd_power_used)
     {
-        memcpy(gpio_info, &(gdisp.screen[sel].lcd_cfg.lcd_power), sizeof(user_gpio_set_t));
+  /*      memcpy(gpio_info, &(gdisp.screen[sel].lcd_cfg.lcd_power), sizeof(user_gpio_set_t));
 
         if(!b_en)
         {
             gpio_info->data = (gpio_info->data==0)?1:0;
         }
-
+   */
         hdl = OSAL_GPIO_Request(gpio_info, 1);
         OSAL_GPIO_Release(hdl, 2);
     }
