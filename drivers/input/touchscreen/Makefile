@@ -62,6 +62,7 @@ obj-$(CONFIG_TOUCHSCREEN_WM97XX_ZYLONITE)	+= zylonite-wm97xx.o
 obj-$(CONFIG_TOUCHSCREEN_W90X900)	+= w90p910_ts.o
 obj-$(CONFIG_TOUCHSCREEN_TPS6507X)	+= tps6507x-ts.o
 obj-$(CONFIG_TOUCHSCREEN_FT5X_TS) += ft5x_ts.o
+obj-$(CONFIG_TOUCHSCREEN_FT5X_TS_V3) += ft5x_ts_v3.o
 obj-$(CONFIG_TOUCHSCREEN_GT801)         += goodix_touch.o
 obj-$(CONFIG_TOUCHSCREEN_GT801NI)	+= goodix_hack.o
 obj-$(CONFIG_TOUCHSCREEN_ZT8031)         += zt8031.o
