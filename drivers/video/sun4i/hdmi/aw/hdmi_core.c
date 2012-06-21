@@ -83,7 +83,7 @@ __s32 main_Hpd_Check(void)
 __s32 hdmi_main_task_loop(void)
 {
 	static __u32 times = 0;
-	
+
 	HPD = main_Hpd_Check();
 	if( !HPD )
 	{
