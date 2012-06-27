@@ -237,7 +237,7 @@ int Hdmi_run_thread(void *parg)
 	while (1)
 	{
 		Hdmi_hal_main_task();
-		hdmi_delay_ms(2000);   
+	    	hdmi_delay_ms(2000);
 	}
 
 	return 0;
