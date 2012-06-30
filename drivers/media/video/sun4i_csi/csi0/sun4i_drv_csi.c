@@ -1348,35 +1348,38 @@ static int csi_open(struct file *file)
 	
 	csi_clk_enable(dev);
 	csi_reset_disable(dev);
-
-        //open all the device power and set it to standby on
+	
+	//open all the device power and set it to standby on
 	for (input_num=dev->dev_qty-1; input_num>=0; input_num--) {
-             /* update target device info and select it*/
-             ret = update_ccm_info(dev, dev->ccm_cfg[input_num]);
-             if (ret < 0) {
-                 csi_err("CSI Already open!\n");
-             } else { 
-                 dev->csi_mode.vref  = dev->ccm_info->vref;
-                 dev->csi_mode.href = dev->ccm_info->href;
-                 dev->csi_mode.clock = dev->ccm_info->clock;
-                 csi_clk_out_set(dev);
-                 ret = v4l2_subdev_call(dev->sd,core, s_power, CSI_SUBDEV_PWR_ON);
-                 if (ret!=0) {
-	  	     csi_err("sensor CSI_SUBDEV_PWR_ON error at device number %d when csi open!\n",input_num);
-                 }
-                 ret = v4l2_subdev_call(dev->sd,core, s_power, CSI_SUBDEV_STBY_ON);
-		 if (ret!=0) {
-	  	     csi_err("sensor CSI_SUBDEV_STBY_ON error at device number %d when csi open!\n",input_num);
-	         } 
-	     }
-        }
+		/* update target device info and select it*/
+		ret = update_ccm_info(dev, dev->ccm_cfg[input_num]);
+		if (ret < 0)
+		{
+			csi_err("Error when set ccm info when csi open!\n");
+		}
+		
+		dev->csi_mode.vref       = dev->ccm_info->vref;
+	  dev->csi_mode.href       = dev->ccm_info->href;
+	  dev->csi_mode.clock      = dev->ccm_info->clock;
+		csi_clk_out_set(dev);
+		
+		ret = v4l2_subdev_call(dev->sd,core, s_power, CSI_SUBDEV_PWR_ON);
+	  if (ret!=0) {
+	  	csi_err("sensor CSI_SUBDEV_PWR_ON error at device number %d when csi open!\n",input_num);
+	  }
 
+		ret = v4l2_subdev_call(dev->sd,core, s_power, CSI_SUBDEV_STBY_ON);
+		if (ret!=0) {
+	  	csi_err("sensor CSI_SUBDEV_STBY_ON error at device number %d when csi open!\n",input_num);
+	  } 
+	}
+	
 	dev->input=0;//default input
 
 	bsp_csi_open(dev);
 	bsp_csi_set_offset(dev,0,0);//h and v offset is initialed to zero
 	
-	ret = v4l2_subdev_call(dev->sd, core, s_power, CSI_SUBDEV_STBY_OFF);
+	ret = v4l2_subdev_call(dev->sd,core, s_power, CSI_SUBDEV_STBY_OFF);
 	if (ret!=0) {
 	  csi_err("sensor standby off error when csi open!\n");
 	  return ret;
@@ -1425,23 +1428,34 @@ static int csi_close(struct file *file)
 	csi_clk_disable(dev);
 	csi_reset_enable(dev);
 
+
 	videobuf_stop(&dev->vb_vidq);
 	videobuf_mmap_free(&dev->vb_vidq);
 
-	dev->opened = 0;
-        csi_stop_generating(dev);
-
+	dev->opened=0;
+	csi_stop_generating(dev);
+	
 	if(dev->stby_mode == 0) {
-           return v4l2_subdev_call(dev->sd,core, s_power, CSI_SUBDEV_STBY_ON);
+		return v4l2_subdev_call(dev->sd,core, s_power, CSI_SUBDEV_STBY_ON);
 	} else {
-          //close all the device power	
-          ret = v4l2_subdev_call(dev->sd, core, s_power, CSI_SUBDEV_PWR_OFF);
-          if (ret != 0) {
-              csi_err("sensor power off error at device number %d when csi open!\n",input_num);
-              return ret;
-           }
-        }
-        return 0;
+		//close all the device power	
+		for (input_num=0; input_num<dev->dev_qty; input_num++) {
+      /* update target device info and select it */
+      ret = update_ccm_info(dev, dev->ccm_cfg[input_num]);
+			if (ret < 0)
+			{
+				csi_err("Error when set ccm info when csi_close!\n");
+			}
+			
+			ret = v4l2_subdev_call(dev->sd,core, s_power, CSI_SUBDEV_PWR_OFF);
+		  if (ret!=0) {
+		  	csi_err("sensor power off error at device number %d when csi open!\n",input_num);
+		  	return ret;
+		  }
+		}
+	}
+	
+	return 0;
 }
 
 static int csi_mmap(struct file *file, struct vm_area_struct *vma)
@@ -1488,8 +1502,8 @@ static const struct v4l2_ioctl_ops csi_ioctl_ops = {
 	.vidioc_queryctrl         = vidioc_queryctrl,
 	.vidioc_g_ctrl            = vidioc_g_ctrl,
 	.vidioc_s_ctrl            = vidioc_s_ctrl,
-	.vidioc_g_parm            = vidioc_g_parm,
-	.vidioc_s_parm            = vidioc_s_parm,
+	.vidioc_g_parm		 			  = vidioc_g_parm,
+	.vidioc_s_parm		  			= vidioc_s_parm,
 
 #ifdef CONFIG_VIDEO_V4L1_COMPAT
 	.vidiocgmbuf              = vidiocgmbuf,
@@ -1497,10 +1511,10 @@ static const struct v4l2_ioctl_ops csi_ioctl_ops = {
 };
 
 static struct video_device csi_template = {
-	.name       = "csi",
+	.name		= "csi",
 	.fops       = &csi_fops,
-	.ioctl_ops  = &csi_ioctl_ops,
-	.release    = video_device_release,
+	.ioctl_ops 	= &csi_ioctl_ops,
+	.release	= video_device_release,
 };
 
 static int fetch_config(struct csi_dev *dev)
