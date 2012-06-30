@@ -1349,30 +1349,27 @@ static int csi_open(struct file *file)
 	csi_clk_enable(dev);
 	csi_reset_disable(dev);
 	
-	//open all the device power and set it to standby on
+        //open all the device power and set it to standby on
 	for (input_num=dev->dev_qty-1; input_num>=0; input_num--) {
-		/* update target device info and select it*/
-		ret = update_ccm_info(dev, dev->ccm_cfg[input_num]);
-		if (ret < 0)
-		{
-			csi_err("Error when set ccm info when csi open!\n");
-		}
-		
-		dev->csi_mode.vref       = dev->ccm_info->vref;
-	  dev->csi_mode.href       = dev->ccm_info->href;
-	  dev->csi_mode.clock      = dev->ccm_info->clock;
-		csi_clk_out_set(dev);
-		
-		ret = v4l2_subdev_call(dev->sd,core, s_power, CSI_SUBDEV_PWR_ON);
-	  if (ret!=0) {
-	  	csi_err("sensor CSI_SUBDEV_PWR_ON error at device number %d when csi open!\n",input_num);
-	  }
-
-		ret = v4l2_subdev_call(dev->sd,core, s_power, CSI_SUBDEV_STBY_ON);
-		if (ret!=0) {
-	  	csi_err("sensor CSI_SUBDEV_STBY_ON error at device number %d when csi open!\n",input_num);
-	  } 
-	}
+             /* update target device info and select it*/
+             ret = update_ccm_info(dev, dev->ccm_cfg[input_num]);
+             if (ret < 0) {
+                 csi_err("CSI Already open!\n");
+             } else { 
+                 dev->csi_mode.vref  = dev->ccm_info->vref;
+                 dev->csi_mode.href = dev->ccm_info->href;
+                 dev->csi_mode.clock = dev->ccm_info->clock;
+                 csi_clk_out_set(dev);
+                 ret = v4l2_subdev_call(dev->sd,core, s_power, CSI_SUBDEV_PWR_ON);
+                 if (ret!=0) {
+	  	     csi_err("sensor CSI_SUBDEV_PWR_ON error at device number %d when csi open!\n",input_num);
+                 }
+                 ret = v4l2_subdev_call(dev->sd,core, s_power, CSI_SUBDEV_STBY_ON);
+		 if (ret!=0) {
+	  	     csi_err("sensor CSI_SUBDEV_STBY_ON error at device number %d when csi open!\n",input_num);
+	         } 
+	     }
+        }
 	
 	dev->input=0;//default input
 
