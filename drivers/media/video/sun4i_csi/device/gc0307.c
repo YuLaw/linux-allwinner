@@ -56,6 +56,8 @@ MODULE_LICENSE("GPL");
 #define csi_dev_err(x,arg...) printk(KERN_INFO"[CSI_ERR][GC0307]"x,##arg)
 #define csi_dev_print(x,arg...) printk(KERN_INFO"[CSI][GC0307]"x,##arg)
 
+#define CSI_NAME	"gc0307"
+
 #define MCLK (12*1000*1000)
 #define VREF_POL	CSI_HIGH
 #define HREF_POL	CSI_HIGH
@@ -2628,6 +2630,16 @@ static struct i2c_driver sensor_driver = {
 };
 static __init int init_sensor(void)
 {
+	char name[10];
+	script_parser_value_type_t type = SCIRPT_PARSER_VALUE_TYPE_STRING;
+
+	script_parser_fetch_ex("csi0_para", "csi_mname", (int *)(&name), &type, sizeof(name)/sizeof(int));
+
+	if(strcmp(CSI_NAME, name)){
+		pr_err("%s: name %s does not match CSI_NAME %s. \n", __func__, name, CSI_NAME);
+		return -1;
+	}
+
 	return i2c_add_driver(&sensor_driver);
 }
 
